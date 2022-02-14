@@ -22,13 +22,16 @@ def create_database():
         cur.execute("DROP DATABASE IF EXISTS sparkifydb")
         cur.execute("CREATE DATABASE sparkifydb WITH ENCODING 'utf8' TEMPLATE template0")
     except psycopg2.Error as e:
-        print("Could not drop existing database.")
+        print("Could not drop existing database. Error:", e)
 
         response = input("Do you want to force close all active database connections y/n? ")
         if response in ("yes", "y"):
             cur.execute(close_connections)
             conn.close()
             print("all connections are closed")
+        else:
+            print("stopping creation of the database")
+
 
     # close connection to default database
     conn.close()
