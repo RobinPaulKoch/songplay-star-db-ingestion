@@ -10,14 +10,14 @@ def process_song_file(cur, filepath) -> None:
     - Reads a JSON file for the given filepath
     - Ingests the data into the 'songs' and 'artists' tables with predefined columns
     """
-    
+
     # open song file
     df = pd.read_json(filepath, lines=True)
 
     # insert song record
     song_data = df[['song_id', 'title', 'artist_id', 'year', 'duration']].values[0].tolist()
     cur.execute(song_table_insert, song_data)
-    
+
     # insert artist record
     artist_data = df[['artist_id', 'artist_name', 'artist_location', 'artist_latitude', 'artist_longitude']].values[0].tolist()
     cur.execute(artist_table_insert, artist_data)
@@ -29,7 +29,7 @@ def process_log_file(cur, filepath) -> None:
     - Converts transforms the timestamp column to readable columns for the time table in the database
     - Ingests all the rows of the logdata into the fact table (songplays) and the dimension tables 'users' and 'time'
     """
-    
+
     # open log file
     df = pd.read_json(filepath, lines=True)
 
@@ -38,7 +38,7 @@ def process_log_file(cur, filepath) -> None:
 
     # convert timestamp column to datetime
     t = pd.to_datetime(df['ts'], unit="ms")
-    
+
     # insert time data records
     time_data = (t.dt.strftime('%Y-%m-%d %H:%M:%S'), t.dt.hour, t.dt.day, t.dt.week, t.dt.month, t.dt.year, t.dt.weekday)
     column_labels = ('start_time', 'hour', 'day', 'week', 'month', 'year', 'weekday')
@@ -56,11 +56,11 @@ def process_log_file(cur, filepath) -> None:
 
     # insert songplay records
     for index, row in df.iterrows():
-        
+
         # get songid and artistid from song and artist tables
         cur.execute(song_select, (row.song, row.artist, row.length))
         results = cur.fetchone()
-        
+
         if results:
             songid, artistid = results
         else:
@@ -83,9 +83,9 @@ def get_files(filepath) -> list:
         files = glob.glob(os.path.join(root,'*.json'))
         for f in files :
             all_files.append(os.path.abspath(f))
-            
+
     return all_files
-        
+
 def process_data(cur, conn, filepath, func) -> None:
     """
     - Reads files to be ingested
@@ -106,7 +106,10 @@ def process_data(cur, conn, filepath, func) -> None:
 
 def main():
     # Normally we should retrieve username + password by other means, such as environment, managed identities etc.
-    conn = psycopg2.connect("host=127.0.0.1 dbname=sparkifydb user=student password=student")
+    conn = psycopg2.connect(f"""
+        host=127.0.0.1 dbname=sparkifydb
+        user={os.environ['postgres_user']}
+        password={os.environ['postgres_password']}""")
     cur = conn.cursor()
 
     process_data(cur, conn, filepath='data/song_data', func=process_song_file)

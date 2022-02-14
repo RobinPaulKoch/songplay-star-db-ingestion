@@ -57,14 +57,14 @@ VALUES (%s, %s, %s, %s, %s, %s, %s)
 
 # FIND SONGS
 song_select = ("""
-SELECT 
+SELECT
     a.artist_id,
     s.song_id
 FROM
     artists as a
 INNER JOIN
     songs as s
-ON 
+ON
     a.artist_id = s.artist_id
 WHERE
     s.title = %s
@@ -76,11 +76,11 @@ AND
 
 # CLOSE EXISTING CONNECTIONS
 close_connections = """
-SELECT 
-    pg_terminate_backend(pid) 
-FROM 
-    pg_stat_activity 
-WHERE 
+SELECT
+    pg_terminate_backend(pid)
+FROM
+    pg_stat_activity
+WHERE
     pid <> pg_backend_pid()
     AND datname='sparkifydb';
 """
