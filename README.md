@@ -52,3 +52,12 @@ Besides there are jupyter notebook files with the following purposes:
 
 Finally there is the pipfile and the pipfile.lock which facilitate npm-like dependency installation for Python as discussed before.
 
+## Dimensional model of the data (star-schema)
+The data is modeled according to the starschema, which makes analysis of the facts and dimensions easy and efficient.
+
+As can be seen, the fact table has the optimal amount of normalization with surrogate keys used for artists, songs, users and time respectively.
+However, the fact table is not in 3NF, as transitive dependencies do still exist.
+
+![datamodel-sparkify png](https://user-images.githubusercontent.com/59359167/153952068-3c2ae525-2ca0-4507-ad0d-c0b2b9984423.png)
+
+
